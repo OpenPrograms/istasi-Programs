@@ -127,9 +127,9 @@ while continue == true do
 						},
 					},
 				}
-				
+
 				box:draw ( screen )
-			end
+			end )
 		end
 	elseif e == 'key_down' and x == 113 then
 		continue = false
