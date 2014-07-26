@@ -23,9 +23,7 @@ end
 
 local screens = { ['each'] = function ( self, callback ) for _,screen in ipairs ( self ) do callback ( screen ) end end }
 
-local s = require('ivator/screen')
 local gpu = component.list('gpu',true)
-
 for address in component.list('screen',true) do
 	local o = dofile ( '/usr/lib/ivator/screen.lua' )
 	o.address = address
