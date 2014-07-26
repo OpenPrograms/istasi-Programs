@@ -118,16 +118,16 @@ while continue == true do
 
 			screens:each ( function ( screen )
 				local box = boxes [result.values]
-
 				box.image = {
 					{
 						{
 							['char'] = ' ',
 							['color'] = 0xFFFFFF,
-							['background'] = 0x996666,
+							['background'] = 0x669966,
 						},
 					},
 				}
+				
 				box:draw ( screen )
 			end
 		end
