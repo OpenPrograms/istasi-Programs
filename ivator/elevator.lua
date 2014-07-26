@@ -13,6 +13,7 @@ if elevator ~= nil then
 	local i,last = 1,1
 	while i < last + 16 do
 		floors [i], err = component.invoke ( elevator, 'doesFloorExist', i ) or nil
+		
 		if err ~= nil then last = i - 16 end
 		if floors [i] == true then last = i end
 
@@ -50,17 +51,23 @@ end
 local high = 1
 for k,v in pairs ( floors ) do high = math.max ( high, k ) end
 
+local boxes
 local box = dofile ( '/usr/lib/ivator/box.lua' )
 local zone = dofile ( '/usr/lib/ivator/zone.lua' )
-local zoneSet = true
+local first = true
 
 screens:each ( function ( screen )
 	screen:active ()
 	screen:clear ()
-	box.screen = screen
+	
 
 	for i = 1,high do
 		local width = screen:maxResolution ()
+		if first == true then
+			boxes [i] = dofile ( '/usr/lib/ivator/box.lua' )
+		end
+		local box = boxes [i]
+		box.screen = screen
 
 		box.width = width / 4
 		box.height = 5
@@ -92,12 +99,12 @@ screens:each ( function ( screen )
 		end
 		box:draw ()
 
-		if zoneSet == true then
+		if first == true then
 			zone:add ( box.x,box.y, box.width,box.height, i )
 		end
 	end
 
-	zoneSet = false
+	first = false
 end )
 
 local continue = true
@@ -113,5 +120,9 @@ while continue == true do
 		continue = false
 	end
 end
+
+component.gpu.setForeground ( 0xFFFFFF )
+component.gpu.setBackground ( 0x0 )
+screens:clear ()
 
 if component.gpu.getScreen ~= originalScreen then component.gpu.bind ( originalScreen ) end

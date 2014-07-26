@@ -33,7 +33,9 @@ local box = {
 		['halign'] = 'center',
 		['valign'] = 'center',
 	},
-	['draw'] = function ( self )
+	['draw'] = function ( self, screen )
+		if screen ~= nil then self.screen = screen end
+		
 		local last = false
 		for y = 1, self.height do
 			local draw = ''
