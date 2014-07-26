@@ -22,19 +22,6 @@ if elevator ~= nil then
 end
 
 local screens = { ['each'] = function ( self, callback ) for _,screen in ipairs ( self ) do callback ( screen ) end end }
-setmetatable ( screens, { -- So slow.
-	['__index'] = function ( self, key )
-		if type(key) == 'string' and self [1] ~= nil and self [1][key] ~= nil then
-			return function ( ... )
-				for _,screen in ipairs ( self ) do
-					screen [key] ( screen, ... )
-				end
-			end
-		else
-			error ( 'call to invalid function' )
-		end
-	end,
-} )
 
 local s = require('ivator/screen')
 local gpu = component.list('gpu',true)
@@ -51,7 +38,7 @@ end
 local high = 1
 for k,v in pairs ( floors ) do high = math.max ( high, k ) end
 
-local boxes = {}
+local boxes = {['default'] = dofile ( '/usr/lib/ivator/box.lua' )}
 local box = dofile ( '/usr/lib/ivator/box.lua' )
 local zone = dofile ( '/usr/lib/ivator/zone.lua' )
 local first = true
@@ -87,15 +74,7 @@ screens:each ( function ( screen )
 				},
 			}
 		else
-			box.image = {
-				{
-					{
-						['char'] = ' ',
-						['color'] = 0xFFFFFF,
-						['background'] = 0x669966,
-					},
-				},
-			}
+			box.image = boxes['default'].image
 		end
 		box:draw ()
 
@@ -107,14 +86,41 @@ screens:each ( function ( screen )
 	first = false
 end )
 
+local trollEvent = {
+	['elevator_stopped'] = function (floor)
+		screens:each ( function (screen ) 
+			screen:active ()
+
+			for i=1,high do
+				if floors [i] ~= nil and i ~= floor  and boxes [i].target == nil then
+					boxes [i].image = boxes['default'].image
+					boxes [i]:draw ()
+				end
+			end
+
+			boxes [floor].image = {
+				{
+					{
+						['char'] = ' ',
+						['color'] = 0xFFFFFF,
+						['background'] = 0x666699,
+					},
+				},
+			}
+			boxes [floor]:draw ( screen )
+		end)
+	end,
+}
+
 local continue = true
 while continue == true do
 	local e, _, x,y, button = event.pull()
 
 	if e == 'touch' then
 		local result = zone:get (x,y)
-		if result ~= nil then
+		if result ~= nil and floors [result.values] ~= nil then
 			component.invoke ( elevator, 'call', result.values )
+			boxes [result.values].target = true
 
 			screens:each ( function ( screen )
 				local box = boxes [result.values]
@@ -123,21 +129,41 @@ while continue == true do
 						{
 							['char'] = ' ',
 							['color'] = 0xFFFFFF,
-							['background'] = 0x669966,
+							['background'] = 0x996666,
 						},
 					},
 				}
 
+				screen:active () 
 				box:draw ( screen )
 			end )
+
+			local continue = true
+			while continue == true do
+				os.sleep(0.1)
+
+				local floor = component.invoke ( elevator, 'getElevatorFloor' )
+				if floors [floor] ~= nil then
+					screens:each ( function ( screen ) 
+						trollEvent ['elevator_stopped'] (floor)
+					end )
+				end
+
+				if component.invoke ( elevator, 'isReady' ) == true then
+					boxes [result.values].target = nil
+
+					trollEvent ['elevator_stopped'] (result.values)
+					continue = false
+				end
+			end
 		end
 	elseif e == 'key_down' and x == 113 then
 		continue = false
 	end
 end
 
-screens:setFGColor ( 0xFFFFFF )
-screens:setBGColor ( 0x0000000 )
-screens:clear ()
+screens:each ( function (screen) screen:active () screen:setFGColor ( 0xFFFFFF ) end )
+screens:each ( function (screen) screen:active () screen:setBGColor ( 0x0000000 ) end )
+screens:each ( function (screen) screen:active () screen:clear () end )
 
 if component.gpu.getScreen ~= originalScreen then component.gpu.bind ( originalScreen ) end
