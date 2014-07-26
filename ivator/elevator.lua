@@ -35,12 +35,15 @@ setmetatable ( screens, { -- So slow.
 	end,
 } )
 
+local s = require('ivator/screen')
 local gpu = component.list('gpu',true)
-for address in component.list('screen',true) do
-	local screen = require('ivator/screen') )
-	screen.address = address
 
-	table.insert ( screens, screen )
+for address in component.list('screen',true) do
+	local o = {}
+	for k,v in pairs(s) do o[k]=v end	
+	o.address = address
+
+	table.insert ( screens, o )
 end
 
 
