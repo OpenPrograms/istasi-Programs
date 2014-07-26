@@ -37,7 +37,7 @@ setmetatable ( screens, { -- So slow.
 
 local gpu = component.list('gpu',true)
 for address in component.list('screen',true) do
-	local screen = dofile ( shell.resolve('lib/screen.lua') )
+	local screen = dofile ( shell.resolve('/lib/iVator/screen.lua') )
 	screen.address = address
 
 	table.insert ( screens, screen )
@@ -48,8 +48,8 @@ end
 local high = 1
 for k,v in pairs ( floors ) do high = math.max ( high, k ) end
 
-local box = dofile ( shell.resolve ('lib/box.lua') )
-local zone = dofile ( shell.resolve ( 'lib/zone.lua') )
+local box = dofile ( shell.resolve ('/lib/iVator/box.lua') )
+local zone = dofile ( shell.resolve ( '/lib/iVator/zone.lua') )
 local zoneSet = true
 
 screens:each ( function ( screen )
