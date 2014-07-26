@@ -13,7 +13,7 @@ if elevator ~= nil then
 	local i,last = 1,1
 	while i < last + 16 do
 		floors [i], err = component.invoke ( elevator, 'doesFloorExist', i ) or nil
-		
+
 		if err ~= nil then last = i - 16 end
 		if floors [i] == true then last = i end
 
@@ -51,7 +51,7 @@ end
 local high = 1
 for k,v in pairs ( floors ) do high = math.max ( high, k ) end
 
-local boxes
+local boxes = {}
 local box = dofile ( '/usr/lib/ivator/box.lua' )
 local zone = dofile ( '/usr/lib/ivator/zone.lua' )
 local first = true
