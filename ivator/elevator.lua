@@ -115,14 +115,29 @@ while continue == true do
 		local result = zone:get (x,y)
 		if result ~= nil then
 			component.invoke ( elevator, 'call', result.values )
+
+			screens:each ( function ( screen )
+				local box = boxes [result.values]
+
+				box.image = {
+					{
+						{
+							['char'] = ' ',
+							['color'] = 0xFFFFFF,
+							['background'] = 0x996666,
+						},
+					},
+				}
+				box:draw ( screen )
+			end
 		end
 	elseif e == 'key_down' and x == 113 then
 		continue = false
 	end
 end
 
-component.gpu.setForeground ( 0xFFFFFF )
-component.gpu.setBackground ( 0x0 )
+screens:setFGColor ( 0xFFFFFF )
+screens:setBGColor ( 0x0000000 )
 screens:clear ()
 
 if component.gpu.getScreen ~= originalScreen then component.gpu.bind ( originalScreen ) end
