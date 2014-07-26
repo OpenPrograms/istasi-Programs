@@ -39,8 +39,7 @@ local s = require('ivator/screen')
 local gpu = component.list('gpu',true)
 
 for address in component.list('screen',true) do
-	local o = {}
-	for k,v in pairs(s) do o[k]=v end	
+	local o = dofile ( '/usr/lib/ivator/screen.lua' )
 	o.address = address
 
 	table.insert ( screens, o )
@@ -51,8 +50,8 @@ end
 local high = 1
 for k,v in pairs ( floors ) do high = math.max ( high, k ) end
 
-local box = require ('ivator/box')
-local zone = require ('ivator/zone')
+local box = dofile ( '/usr/lib/ivator/box.lua' )
+local zone = dofile ( '/usr/lib/ivator/zone.lua' )
 local zoneSet = true
 
 screens:each ( function ( screen )
