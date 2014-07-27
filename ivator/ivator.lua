@@ -69,7 +69,12 @@ screens:each ( function ( screen )
 		box.x = (width / 3) * ((i - 1) % 3) + ((width/3 - width/4) / 2)
 		box.y =  ((box.height + 2) * math.ceil (i/3)) - 3
 
-		box.name = i
+		if config.names and config.names [i] ~= nil then
+			box.name = config.names [i]
+		else
+			box.name = i
+		end
+		
 		if floors [i] == nil then
 			box.image = config.box.image.disabled
 		else
