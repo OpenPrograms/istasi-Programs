@@ -97,7 +97,7 @@ local trollEvent = {
 
 			for i=1,high do
 				if floors [i] ~= nil and i ~= floor  and boxes [i].target == nil then
-					boxes [i].image = boxes['default'].image
+					boxes [i].image = config.box.image.default
 					boxes [i]:draw ()
 				end
 			end
