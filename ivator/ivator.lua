@@ -110,22 +110,38 @@ local trollEvent = {
 	end,
 }
 
+local function buildString ( f )
+	local d = ''
+
+	local continue = true
+	while continue == true do
+		local _, _, u, a = event.pull ( 'key_down' )
+
+		if u == 0 then return true end
+
+		d = d .. unicode.char ( u )
+		continue, d = f(d)
+	end
+
+	return d
+end
+
 local continue = true
 while continue == true do
 	local e, _, x,y, button = event.pull()
 
 	if e == 'touch' then
 		local result = zone:get (x,y)
-		if result ~= nil and floors [result.values] ~= nil then
+		if result ~= nil and button == 0 and floors [result.values] ~= nil then
 			component.invoke ( elevator, 'call', result.values )
 			boxes [result.values].target = true
+			local box = boxes [result.values]
 
 			screens:each ( function ( screen )
-				local box = boxes [result.values]
 				box.image = {
 					{
 						{
-							['char'] = ' ',
+							['char']  = ' ',
 							['color'] = 0xFFFFFF,
 							['background'] = 0x996666,
 						},
@@ -154,6 +170,42 @@ while continue == true do
 					continue = false
 				end
 			end
+		elseif result ~= nil and button == 1 and floors [result.values] ~= nil then
+			local box = boxes [result.values]
+			box.name = 'Name: '
+			box.image = {
+				{
+					{
+						['char']  = ' ',
+						['color'] = 0xFFFFFF,
+						['background'] = 0xff9900,
+					},
+				},
+			}
+			screens:each ( function ( screen ) screen:active () box:draw ( screen ) end )
+
+			local str = buildString ( function ( str )
+				local r = true
+				if string.byte (unicode.sub ( str, #str, #str )) == 8 then
+					str = unicode.sub ( str, 1, #str - 2 )
+				elseif string.byte (unicode.sub ( str, #str, #str )) == 13 then
+					str = unicode.sub ( str, 1, #str - 1 )
+					r = false
+				end
+
+				box.name = 'Name: ' .. str
+				screens:each ( function ( screen )
+					screen:active ()
+					box:draw ( screen )
+				end )
+
+				return r, str
+			end )
+
+			if str == '' then str = result.values end
+			box.name = str
+			box.image = boxes ['default'].image
+			screens:each ( function ( screen ) screen:active () box:draw ( screen ) end )
 		end
 	elseif e == 'key_down' and x == 113 then
 		continue = false
