@@ -1,0 +1,23 @@
+NAME
+  ivator - Controls the elevator added in thut's concrete
+
+SYNOPSIS
+  ivator
+
+DESCRIPTION
+  Moves the elevator depending on where was clicked.
+
+  It'll generate a box per floor that it finds, if there's empty floors between the first and the next, it'll generate a box for those aswell, 
+  although they will disabled.
+
+COLOR CODING
+  	red:    the floor the elevator is currently headed to.
+  	blue:   the floor t he elevator is currently at.
+  	orange: the name of the floor is being editted.
+  	gray:   disabled floor, added due to empty floors between valid destinations.
+  	green:  Valid destinations, these can be clicked, and the elevator will move there.
+
+CONFIG
+	usr/etc/ivator.cfg
+
+	This is just a table dump, edit with care.
