@@ -2,6 +2,8 @@ local component = require( 'component' )
 local shell = require ('shell' )
 local unicode = require('unicode')
 local event = require('event')
+local serialize = dofile ('/usr/lib/ivator/serialize.lua')
+
 
 local originalScreen = component.screen.address
 
@@ -24,7 +26,6 @@ if elevator ~= nil then
 end
 
 local screens = { ['each'] = function ( self, callback ) for _,screen in ipairs ( self ) do callback ( screen ) end end }
-
 local gpu = component.list('gpu',true)
 for address in component.list('screen',true) do
 	local o = dofile ( '/usr/lib/ivator/screen.lua' )
@@ -37,12 +38,14 @@ local f = io.open ( '/usr/etc/ivator.cfg', 'r' )
 local c = f:read('*a')
 f:close ()
 local config = load ( 'return ' .. c )
+if type(config) ~= 'function' then error ( 'Error while loading config.' ) end
+config = config ()
 c = nil
 
 local high = 1
 for k,v in pairs ( floors ) do high = math.max ( high, k ) end
 
-local boxes = {['default'] = dofile ( '/usr/lib/ivator/box.lua' )}
+local boxes = {}
 local box = dofile ( '/usr/lib/ivator/box.lua' )
 local zone = dofile ( '/usr/lib/ivator/zone.lua' )
 local first = true
@@ -68,17 +71,9 @@ screens:each ( function ( screen )
 
 		box.name = i
 		if floors [i] == nil then
-			box.image = {
-				{
-					{
-						['char'] = ' ',
-						['color'] = 0xFFFFFF,
-						['background'] = 0x666666,
-					},
-				},
-			}
+			box.image = config.box.image.disabled
 		else
-			box.image = boxes['default'].image
+			box.image = config.box.image.default
 		end
 		box:draw ()
 
@@ -102,15 +97,7 @@ local trollEvent = {
 				end
 			end
 
-			boxes [floor].image = {
-				{
-					{
-						['char'] = ' ',
-						['color'] = 0xFFFFFF,
-						['background'] = 0x666699,
-					},
-				},
-			}
+			boxes [floor].image = config.box.image.currentlyAt
 			boxes [floor]:draw ( screen )
 		end)
 	end,
@@ -144,15 +131,7 @@ while continue == true do
 			local box = boxes [result.values]
 
 			screens:each ( function ( screen )
-				box.image = {
-					{
-						{
-							['char']  = ' ',
-							['color'] = 0xFFFFFF,
-							['background'] = 0x996666,
-						},
-					},
-				}
+				box.image = config.box.image.destination
 
 				screen:active () 
 				box:draw ( screen )
@@ -179,17 +158,9 @@ while continue == true do
 		elseif result ~= nil and button == 1 and floors [result.values] ~= nil then
 			local box = boxes [result.values]
 			box.name = 'Name: '
-			box.image = {
-				{
-					{
-						['char']  = ' ',
-						['color'] = 0xFFFFFF,
-						['background'] = 0xff9900,
-					},
-				},
-			}
-			screens:each ( function ( screen ) screen:active () box:draw ( screen ) end )
+			box.image = config.box.image.editing
 
+			screens:each ( function ( screen ) screen:active () box:draw ( screen ) end )
 			local str = buildString ( function ( str )
 				local r = true
 				if string.byte (unicode.sub ( str, #str, #str )) == 8 then
@@ -212,6 +183,10 @@ while continue == true do
 			box.name = str
 			box.image = boxes ['default'].image
 			screens:each ( function ( screen ) screen:active () box:draw ( screen ) end )
+
+			--local f = io.open ( '/usr/etc/ivator.cfg', 'w' )
+			--f:write ( serialize.pack ( config, 0, true ) )
+			--f:close ()
 		end
 	elseif e == 'key_down' and x == 113 then
 		continue = false
