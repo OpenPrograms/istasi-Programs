@@ -5,7 +5,6 @@ local event = require('event')
 
 local originalScreen = component.screen.address
 
-error ( 'woh' )
 local elevator = component.list ('elevator', true) ()
 assert ( 'elevator not found' )
 
