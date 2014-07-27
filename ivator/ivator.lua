@@ -117,10 +117,10 @@ local function buildString ( f )
 	while continue == true do
 		local _, _, u, a = event.pull ( 'key_down' )
 
-		if u == 0 then return true end
-
-		d = d .. unicode.char ( u )
-		continue, d = f(d)
+		if u ~= 0 then
+			d = d .. unicode.char ( u )
+			continue, d = f(d)
+		end
 	end
 
 	return d
