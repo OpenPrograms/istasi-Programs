@@ -10,6 +10,7 @@ DESCRIPTION
   It'll generate a box per floor that it finds, if there's empty floors between the first and the next, it'll generate a box for those aswell, 
   although they will disabled.
 
+  To quit it while its running, press Q
 COLOR CODING
   	red:    the floor the elevator is currently headed to.
   	blue:   the floor t he elevator is currently at.
