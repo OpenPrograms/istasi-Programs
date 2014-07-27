@@ -181,12 +181,15 @@ while continue == true do
 
 			if str == '' then str = result.values end
 			box.name = str
-			box.image = boxes ['default'].image
+			box.image = config.box.image.default
 			screens:each ( function ( screen ) screen:active () box:draw ( screen ) end )
 
-			--local f = io.open ( '/usr/etc/ivator.cfg', 'w' )
-			--f:write ( serialize.pack ( config, 0, true ) )
-			--f:close ()
+			if config.names == nil then config.names = {} end
+			config.names [result.values] = str
+
+			local f = io.open ( '/usr/etc/ivator.cfg', 'w' )
+			f:write ( serialize.pack ( config, 0, true ) )
+			f:close ()
 		end
 	elseif e == 'key_down' and x == 113 then
 		continue = false
