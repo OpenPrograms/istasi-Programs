@@ -36,10 +36,22 @@ local screen = {
 			end
 			return true
 		end
-
+		if type(color) == 'string' then
+			local tmp = color:match ( '0x([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])' )
+			assert ( tmp, 'screen.setBGColor, bad color recieved, unable to parse' )
+			
+			color = tonumber(tmp,16)
+		end
+	
 		self.bgColor = color
 	end,
 	['setFGColor'] = function ( self, color )
+		if color == nil then
+			if component.invoke ( self.gpu, 'getForeground' ) ~= self.fgColor then
+				component.invoke ( self.gpu, 'setForeground', self.fgColor ) 
+			end
+			return true
+		end
 		if type(color) == 'string' then
 			local tmp = color:match ( '0x([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])' )
 			assert ( tmp, 'screen.setFGColor, bad color recieved, unable to parse' )
