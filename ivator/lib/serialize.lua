@@ -1,32 +1,35 @@
--- Trololol, if a table links to another table, which links to the first table, forever loop until stack pointer issues, but look at the size of this thing, such lazy <3
--- Ninja level added, this gonna break shit.
+-- Lazy depth fix
 
 local serialize = {}
-function serialize.pack ( _table, level )
+function serialize.pack ( _table, level, pretty )
 	level = level or 0
-	if level > 100 then error ( 'Gone too deep!' ) end
+	if level > 100 then return '{}' end
 
-	local str = '{\n '
+	pretty = pretty or false
+	local t,n = '',''
+	if pretty == true then t,n = '\t', '\n' end
+
+	local str = '{ ' .. n
 	for k,v in pairs ( _table ) do
 		if tostring(k):match ( '^%d+$') then
-			str = str .. string.rep('\t', level ) .. '\t[' .. tostring(k) .. ']'
+			str = str .. string.rep( t, level ) .. t .. '[' .. tostring(k) .. ']'
 		else
-			str = str .. string.rep('\t', level ) .. '\t["' .. tostring(k) .. '"]'
+			str = str .. string.rep( t, level ) .. t .. '["' .. tostring(k) .. '"]'
 		end
 
 		str = str .. ' = '
 		if type(v) == 'number' then
-			str = str .. tostring(v) .. ', \n'
+			str = str .. tostring(v) .. ', ' .. n
 		elseif type(v) == 'string' then
-			str = str .. '"' .. tostring(v) .. '", \n'
+			str = str .. '"' .. tostring(v) .. '", ' .. n
 		elseif type(v) == 'table' then
-			str = str .. serialize.pack (v, level + 1) .. ', \n'
+			str = str .. serialize.pack (v, level + 1, pretty) .. ', ' .. n
 		else
-			str = str .. '"", \n'
+			str = str .. '"", ' .. n
 		end
 	end
 
-	return str .. '\n}'
+	return str .. string.rep( t, level ) .. '}'
 end
 
 function serialize.unpack ( str )
