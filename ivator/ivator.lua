@@ -33,7 +33,11 @@ for address in component.list('screen',true) do
 	table.insert ( screens, o )
 end
 
-
+local f = io.open ( '/usr/etc/ivator.cfg', 'r' )
+local c = f:read('*a')
+f:close ()
+local config = load ( 'return ' .. c )
+c = nil
 
 local high = 1
 for k,v in pairs ( floors ) do high = math.max ( high, k ) end
