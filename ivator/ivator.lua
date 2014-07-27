@@ -6,6 +6,8 @@ local event = require('event')
 local originalScreen = component.screen.address
 
 local elevator = component.list ('elevator', true) ()
+assert ( 'elevator not found' )
+
 local floors = {}
 
 -- Incase the mod ever desides going for more than 16 floors, support we shall have!
