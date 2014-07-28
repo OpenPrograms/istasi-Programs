@@ -67,7 +67,7 @@ screens:each ( function ( screen )
 		box.screen = screen
 
 		if config.box.width == nil or config.box.width < 1 then
-			box.width = cWidth * config.box.width or 0.9
+			box.width = math.floor (cWidth * config.box.width or 0.9)
 		else
 			box.width = config.box.width
 		end
