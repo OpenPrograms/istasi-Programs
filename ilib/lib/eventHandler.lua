@@ -1,3 +1,5 @@
+local computer = require('computer')
+
 local registered = {}
 local children = {}
 local jobs = {}
