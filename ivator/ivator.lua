@@ -50,24 +50,32 @@ local box = dofile ( '/usr/lib/ivator/box.lua' )
 local zone = dofile ( '/usr/lib/ivator/zone.lua' )
 local first = true
 
+
 screens:each ( function ( screen )
 	screen:active ()
 	screen:clear ()
-	
+
+	local width = screen:maxResolution ()
+	local cWidth = width / config.box.columns or 3
 
 	for i = 1,high do
-		local width = screen:maxResolution ()
+		
 		if first == true then
 			boxes [i] = dofile ( '/usr/lib/ivator/box.lua' )
 		end
 		local box = boxes [i]
 		box.screen = screen
 
-		box.width = width / 4
-		box.height = 5
+		if config.box.width == nil or config.box.width < 1 then
+			box.width = cWidth * config.box.width or 0.9
+		else
+			box.width = config.box.width
+		end
 
-		box.x = (width / 3) * ((i - 1) % 3) + ((width/3 - width/4) / 2)
-		box.y =  ((box.height + 2) * math.ceil (i/3)) - 3
+		box.height = config.box.height or 5
+
+		box.x = ((width / config.box.columns or 3) * ((i - 1) % config.box.columns or 3)) + 1 + (cWidth/2 - box.width/2)
+		box.y =  ((box.height + 2) * math.ceil (i/config.box.columns)) - 3
 
 		if config.names and config.names [i] ~= nil then
 			box.name = config.names [i]
