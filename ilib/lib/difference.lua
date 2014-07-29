@@ -19,7 +19,17 @@ local difference = {
 		end
 	end,
 	['add'] = function ( self, _table )
+		for k,v in pairs ( default ) do
+			if v == _table[k] then
+				_table[k] = nil
+			end
+		end
+
 		table.insert ( data, _table )
+		return #data
+	end,
+	['rawget'] = function ( self, key )
+		return data [key]
 	end,
 }
 
@@ -32,6 +42,17 @@ setmetatable (difference, {
 		for k,v in pairs ( data[key] ) do o[k]=v end
 
 		return o
+	end,
+	['__newindex'] = function ( self, key, value )
+		if type(value) == 'table' then
+			for k,v in pairs ( default ) do
+				if v == value[k] then
+					value[k] = nil
+				end
+			end
+
+			data [key] = value
+		end
 	end,
 })
 

@@ -100,7 +100,7 @@ local _event = {
 			self.registered ['timer'] = {}
 		end
 
-		table.insert ( self.registered ['timer'], {
+		table.insert (self.registered ['timer'], {
 			['id'] = id,
 			['once'] = false,
 			['interval'] = time,
@@ -108,7 +108,7 @@ local _event = {
 			['arguments'] = {id},
 			['func'] = func,
 			['_thread'] = nil,
-		} )
+		})
 
 		return id
 	end,
@@ -181,7 +181,7 @@ eventHandler = {
 				['time'] = computer.uptime() + 10,
 			}
 
-			for id, event in pairs ( registered ) do
+			for id, event in pairs ( registered ) do -- So much ugly
 				for on, _binds in pairs ( event ) do
 					if type(_binds) == 'table' then
 						for _, bind in pairs ( _binds ) do
@@ -197,14 +197,14 @@ eventHandler = {
 			--
 
 			local event, address, arg1, arg2, arg3 = computer.pullSignal (timer.time - computer.uptime())
-			if event == 'event-handle.stop' then return address end
+			if event == 'event-handler.stop' then return address end
 
 			if event == nil and timer.id ~= nil and timer.func ~= nil then
 				computer.pushSignal ( 'timer', computer.getBootAddress(), timer.id )
 			else
 				local args = {arg1,arg2,arg3}
 
-				for id, _event in pairs ( registered ) do
+				for id, _event in pairs ( registered ) do -- So much ugly
 					for on, _bind in pairs ( _event ) do
 						if type(_bind) == 'table' then
 							if on == event or on == '*' then

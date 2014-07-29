@@ -2,15 +2,9 @@ local component = require('component')
 
 local screen = {
 	['address'] = component.list('screen', true) (),
-	['gpu'] = setmetatable ({
+	['gpu'] = setmetatable ({	-- Please use the gpu lib rather than this, while this work it only takes advantage of a single gpu, where-as the gpu lib uses as many as possible, and evenly.
 		['address'] = component.list('gpu') (),
-		['bound'] = '',
-		['bind'] = function ( self, address )
-			if self.bound == address then return end
-			
-			component.invoke ( self.address, 'bind', address )
-			self.bound = address
-		end
+		['bind'] = function ( self, address ) component.invoke ( self.address, 'bind', address ) end
 	}, {['__tostring'] = function ( self ) return self.address end}),
 
 	['bgColor'] = 0x000000,
