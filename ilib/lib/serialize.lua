@@ -39,13 +39,13 @@ end
 function serialize.unpack ( str )
 	local _table = {}
 
-	if str:match ('^%{.*%}$') == nil then
+	if str:match ('^%{.*%}[ \r\n]*$') == nil then
 		return false, 'not a valid string supplied.'
 	end
 
 	_table, reason = load('return ' .. str)
 	if reason ~= nil then
-		return false, 'not a valid string supplied.'
+		return false, 'issues loading string supplied.'
 	end
 
 	return _table ()
@@ -61,7 +61,7 @@ function serialize.fromFile ( _file )
 		file = filesystem.open ( _file, 'r' )
 	end
 
-	local content = file:read ( '*a' )
+	local content = file:read ( '*all' )
 	file:close ()
 
 	return serialize.unpack ( content )
