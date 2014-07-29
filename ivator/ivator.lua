@@ -42,7 +42,9 @@ event:timer(0, function ()
 
 
 
-	local config = serialize.fromFile ('/usr/etc/ivator.cfg')
+	local config, reason = serialize.fromFile ('/usr/etc/ivator.cfg')
+	if reason ~= nil then error (reason) end
+
 	local boxes = {}
 
 	local high = 1
@@ -238,9 +240,9 @@ event:timer(0, function ()
 end)
 
 event:on ('error', function ( _, _, message )
-	event:push ('event-handler.stop')
+	event:push ('event-handler.stop')	-- Lets stop.
 
-	print ( message )
+	print ( 'Error caught:', message )
 end )
 
 eventHandler.handle ()
