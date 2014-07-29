@@ -19,17 +19,21 @@ function serialize.pack ( _table, level, pretty )
 
 		str = str .. ' = '
 		if type(v) == 'number' then
-			str = str .. tostring(v) .. ', ' .. n
+			str = str .. tostring(v) .. ', ' 
 		elseif type(v) == 'string' then
-			str = str .. '"' .. tostring(v) .. '", ' .. n
+			str = str .. '"' .. tostring(v) .. '", '
 		elseif type(v) == 'table' then
-			str = str .. serialize.pack (v, level + 1, pretty) .. ', ' .. n
+			str = str .. serialize.pack (v, level + 1, pretty) .. ', ' 
+		elseif type(v) == 'boolean' then
+			if v == true then str = str .. 'true, ' else str = str .. 'false, ' end
 		else
-			str = str .. '"", ' .. n
+			str = str .. '"", '
 		end
+
+		str = str .. n
 	end
 
-	return str .. string.rep( t, level ) .. '}'
+	return str .. string.rep (t, level) .. '}'
 end
 
 function serialize.unpack ( str )
@@ -39,12 +43,45 @@ function serialize.unpack ( str )
 		return false, 'not a valid string supplied.'
 	end
 
-	_table, reason = load('return ' .. str )
+	_table, reason = load('return ' .. str)
 	if reason ~= nil then
 		return false, 'not a valid string supplied.'
 	end
 
 	return _table ()
+end
+
+function serialize.fromFile ( _file )
+	local file = nil
+	if _OSVERSION and _OSVERSION:match ( '^OpenOS' ) then
+		if require('filesystem').exists ( _file ) == false then error ( 'serialize.fromFile, File does not exist.' ) end
+		file = io.open ( _file, 'r' )
+	else
+		if filesystem.exists ( file ) == false then error ( 'serialize.fromFile, File does not exist.' ) end
+		file = filesystem.open ( _file, 'r' )
+	end
+
+	local content = file:read ( '*a' )
+	file:close ()
+
+	return serialize.unpack ( content )
+end
+
+function serialize.toFile ( _file, _table, pretty )
+	local str = serialize.pack ( _table, 0, pretty )
+	local file = nil
+	if _OSVERSION and _OSVERSION:match ( '^OpenOS' ) then
+		if require('filesystem').exists ( _file ) == false then error ( 'serialize.toFile, File does not exist.' ) end
+		file = io.open ( _file, 'w' )
+	else
+		if filesystem.exists ( file ) == false then error ( 'serialize.toFile, File does not exist.' ) end
+		file = filesystem.open ( _file, 'w' )
+	end
+
+	local content = file:write ( str )
+	file:close ()
+
+	return true
 end
 
 return serialize
